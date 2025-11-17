@@ -4,13 +4,13 @@ network: "projects/my-gcp-project/global/networks/sky-vpc-a"
 
 regions:
   us-central1:
-    network: "projects/my-gcp-project/global/networks/sky-vpc-a"  # optional override
     routers:
-      router-1:
+      - name: "02"
         description: "Router for VPC-A in us-central1"
-        # asn: 65001  # only if you need BGP (VPN/Interconnect)
+        # asn: 65001   # only needed if using BGP
 
   europe-west3:
     routers:
-      router-5:
+      - name: "02"
         description: "Router for VPC-A in europe-west3"
+

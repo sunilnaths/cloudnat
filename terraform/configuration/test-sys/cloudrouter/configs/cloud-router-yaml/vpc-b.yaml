@@ -1,0 +1,16 @@
+# vpc-a.yaml
+vpc_name: "vpc-b"
+network: "projects/my-gcp-project/global/networks/sky-vpc-a"
+
+regions:
+  us-central1:
+    routers:
+      - name: "02"
+        description: "Router for VPC-A in us-central1"
+        # asn: 65001   # only needed if using BGP
+
+  europe-west3:
+    routers:
+      - name: "02"
+        description: "Router for VPC-A in europe-west3"
+

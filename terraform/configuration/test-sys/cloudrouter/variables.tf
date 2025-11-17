@@ -1,9 +1,5 @@
 variable "configs_path" {
-  description = "Path to VPC router YAML files"
+  description = "Path to Cloud Router VPC YAML files (without /common-config)"
   type        = string
-}
-
-variable "common_config_path" {
-  description = "Common config YAML containing shared variables (project_id, prefix)"
-  type        = string
+  default     = ""
 }

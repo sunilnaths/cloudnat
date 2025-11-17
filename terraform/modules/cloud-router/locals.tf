@@ -1,40 +1,36 @@
-###############################################################################
-# MODULE: cloud-router
-# PURPOSE: Build router map from VPC YAML config
-###############################################################################
-
 locals {
-  vpc        = var.vpc_config
-  vpc_name   = local.vpc.vpc_name
-  project_id = local.vpc.project_id
-  prefix     = try(local.vpc.naming_prefix, "snt")
+  # Direct inputs
+  project_id = var.project_id
+  prefix     = var.prefix
+  vpc_name   = var.vpc_name
+  network    = var.network
 
-  # Routers: flatten regions → routers
+  # Build router list
   routers = flatten([
-    for region_name, region_conf in local.vpc.regions : [
-      for router_name, router_conf in region_conf.routers : {
-        key = "${local.vpc_name}|${region_name}|${router_name}"
-
+    for region_name, region_cfg in var.regions : [
+      for r in region_cfg.routers : {
+        key         = "${local.vpc_name}|${region_name}|${r.name}"
         vpc_name    = local.vpc_name
+        region_name = region_name
+        router_name = r.name
+        description = try(r.description, null)
+        asn         = try(r.asn, null)
         project_id  = local.project_id
-        region      = region_name
-        router_name = router_name
+        prefix      = local.prefix
+        network     = local.network
 
-        # Network resolution:
-        # router_conf.network > region_conf.network > vpc.network
-        network = try(
-          router_conf.network,
-          try(region_conf.network, local.vpc.network)
+        # final name: snt-vpc-a-cr-uscentral1-02
+        final_name = format(
+          "%s-%s-cr-%s-%s",
+          local.prefix,
+          local.vpc_name,
+          replace(region_name, "-", ""),
+          r.name
         )
-
-        description = try(router_conf.description, null)
-        asn         = try(router_conf.asn, null) # optional, only if BGP used
       }
     ]
   ])
 
-  routers_map = {
-    for r in local.routers :
-    r.key => r
-  }
+  routers_map = { for r in local.routers : r.key => r }
 }
+
