@@ -1,0 +1,47 @@
+# === VPC-level metadata ===
+project_id: "my-gcp-project"
+vpc_name: "vpc-a"
+
+# === Per-region definitions ===
+regions:
+  us-central1:
+    routers:
+      router-1:
+        cloud_nats:
+          - name: nat1
+            # === IP Allocation ===
+            address_count: 3        # number of static IPs per NAT
+            drain_nat_ips: []       # optional list of IPs to drain
+            # nat_rules: 2            # number of NAT rules (auto-created)
+            
+            # === Port Allocation ===
+            min_ports_per_vm: 32
+            max_ports_per_vm: 64
+            enable_endpoint_independent_mapping: true 
+            enable_dynamic_port_allocation: false
+            # enable_dynamic_port_allocation: true
+            # enable_dynamic_port_allocation_min_ports_per_vm: 2048
+            # enable_dynamic_port_allocation_max_ports_per_vm: 65536
+            # enable_endpoint_independent_mapping: true
+
+            # === Timeouts ===
+            udp_idle_timeout_sec: 30
+            tcp_established_idle_timeout_sec: 1200
+            tcp_transitory_idle_timeout_sec: 30
+            tcp_time_wait_timeout_sec: 120
+            icmp_idle_timeout_sec: 30
+
+            # === Subnet NAT Control ===
+            source_subnetwork_ip_ranges_to_nat: "LIST_OF_SUBNETWORKS"
+            subnetworks:
+              - name: "projects/my-gcp-project/regions/us-central1/subnetworks/vpc-a-subnet1"
+                source_ip_ranges_to_nat: ["PRIMARY_IP_RANGE"]
+                # secondary_ip_range_names: ["pods", "services"]
+              - name: "projects/my-gcp-project/regions/us-central1/subnetworks/vpc-a-subnet2"
+                source_ip_ranges_to_nat: ["PRIMARY_IP_RANGE"]
+
+            # === Logging ===
+            log_enable: true
+            log_filter: "ALL"    # "ALL" | "ERRORS_ONLY" | "TRANSLATIONS_ONLY"
+
+

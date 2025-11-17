@@ -1,0 +1,3 @@
+project_id: "my-gcp-project"
+organization_id: "1234567890"
+naming_prefix: "snt"

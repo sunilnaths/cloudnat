@@ -1,0 +1,60 @@
+# === VPC-level metadata ===
+project_id: "my-gcp-project"
+vpc_name: "vpc-c"
+
+# === Per-region definitions ===
+regions:
+  us-central1:
+    routers:
+      router-1:
+        # === Reserved IPs Configuration (Separate from NAT) ===
+        reserved_ips:
+          group_a:
+            count: 3
+            description: "Group A - Rule 1 traffic"
+          group_b:
+            count: 3
+            description: "Group B - Rule 2 traffic"
+
+        # === Cloud NAT Configuration ===
+        cloud_nats:
+          - name: nat1
+            
+            # === Port Allocation ===
+            min_ports_per_vm: 32
+            max_ports_per_vm: 64
+            enable_dynamic_port_allocation: false
+            enable_endpoint_independent_mapping: true
+
+            # === Timeouts ===
+            udp_idle_timeout_sec: 30
+            tcp_established_idle_timeout_sec: 1200
+            tcp_transitory_idle_timeout_sec: 30
+            tcp_time_wait_timeout_sec: 120
+            icmp_idle_timeout_sec: 30
+
+            # === Subnet NAT Control ===
+            source_subnetwork_ip_ranges_to_nat: "LIST_OF_SUBNETWORKS"
+            subnetworks:
+              - name: "projects/my-gcp-project/regions/us-central1/subnetworks/vpc-a-subnet1"
+                source_ip_ranges_to_nat: ["PRIMARY_IP_RANGE"]
+              - name: "projects/my-gcp-project/regions/us-central1/subnetworks/vpc-a-subnet2"
+                source_ip_ranges_to_nat: ["PRIMARY_IP_RANGE"]
+
+            # === Logging ===
+            log_enable: true
+            log_filter: "ALL"
+
+            # === NAT Rules - Reference IP Groups ===
+            rules:
+              - rule_number: 100
+                description: "Rule 1 - Using Group A (3 IPs)"
+                match: "SRC_IPS_ALL"
+                action:
+                  ip_group: "group_a"  # Reference the IP group defined above
+
+              - rule_number: 200
+                description: "Rule 2 - Using Group B (3 IPs)"
+                match: "SRC_IPS_ALL"
+                action:
+                  ip_group: "group_b"  # Reference the IP group defined above
