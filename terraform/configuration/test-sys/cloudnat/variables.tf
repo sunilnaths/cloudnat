@@ -1,24 +1,11 @@
-variable "project_id" {
-  description = "GCP Project ID"
+variable "common_config_path" {
+  description = "Path to common NAT config file"
   type        = string
-  default     = "my-gcp-project"
+  default     = null
 }
 
 variable "configs_path" {
-  description = "Path to VPC configuration YAML files"
+  description = "Path to all VPC NAT YAML files"
   type        = string
-  default     = "./configs/cloud-nat-yaml"
+  default     = null
 }
-
-variable "common_config_path" {
-  description = "Path to common configuration YAML"
-  type        = string
-  default     = "./configs/common-config/common.yaml"
-}
-
-variable "enable_nat_creation" {
-  description = "Enable Cloud NAT resource creation"
-  type        = bool
-  default     = true
-}
-

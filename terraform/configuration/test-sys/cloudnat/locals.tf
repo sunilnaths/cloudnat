@@ -1,25 +1,29 @@
-# BLOCK 1: Load common configuration
 locals {
-  common_config = try(
-    yamldecode(file(var.common_config_path)),
-    {}
+
+  # Apply defaults when variables are null
+  common_config_path = (
+    var.common_config_path != null ?
+    var.common_config_path :
+    "${path.module}/configs/common-config/common.yaml"
   )
-}
 
-# BLOCK 2: Find VPC files and load configs
-locals {
-  # Find all VPC YAML files (excluding common-config directory)
-  vpc_yaml_files = [
-    for f in fileset(var.configs_path, "*.yaml") :
-    f if f != "common-config/common.yaml"
-  ]
+  configs_path = (
+    var.configs_path != null ?
+    var.configs_path :
+    "${path.module}/configs/cloud-nat-yaml"
+  )
 
-  # Load and merge each VPC config with common config
+  # Load common.yaml
+  common = yamldecode(file(local.common_config_path))
+
+  # Load each VPC YAML file
+  vpc_yaml_files = fileset(local.configs_path, "*.yaml")
+
   vpc_configs = {
-    for yaml_file in local.vpc_yaml_files :
-    replace(yaml_file, ".yaml", "") => merge(
-      local.common_config,
-      try(yamldecode(file("${var.configs_path}/${yaml_file}")), {})
+    for f in local.vpc_yaml_files :
+    trimsuffix(f, ".yaml") => merge(
+      yamldecode(file("${local.configs_path}/${f}")),
+      local.common
     )
   }
 }

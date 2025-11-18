@@ -3,8 +3,6 @@ module "cloud_nat" {
 
   source = "../../modules/nat_static"
 
-  vpc_config = each.value
+  vpc_config         = each.value
+  common_config_path = local.common_config_path
 }
-
-
-
